@@ -3,6 +3,7 @@
 import discord
 from discord.ext import commands
 from extras import *
+import json
 
 with open("tokenfile", "r") as tokenfile:
 	token=tokenfile.read()
@@ -71,7 +72,19 @@ async def spoiler(ctx,*text):
 
 @client.command(aliases=["sw"])
 async def swear(ctx,*text):
-	pass
-
+	with open("swears.json","r") as swearsfile: swears = json.loads(swearsfile.read())
+	text = list(text)
+	for word in text:
+		for swear in swears:
+			if swear in word:
+				text[text.index(word)] = f"||{word}||"
+	text = " ".join(text)
+	images = await attachments_to_files(ctx.message.attachments,True)
+	await ctx.message.delete()
+	imitated = ctx.author
+	avatar = await imitated.avatar_url_as(format="png").read()
+	hook = await ctx.channel.create_webhook(name=imitated.display_name,avatar=avatar)
+	await hook.send(content=text,files=images)
+	await hook.delete()
 
 client.run(token)
