@@ -45,7 +45,7 @@ async def on_ready():
 	print("logged in as {0.user}".format(client))
 
 @client.command(aliases=["sp"],description="Spoilers either your previous message's attachments, your previous message's text, the rest of the message's text, or the message's attachments.",brief="Spoilers your stuff",category="d")
-async def spoiler(ctx,*text):
+async def spoiler(ctx:commands.context.Context,*text):
 	use_prev_msg = True if text == () and len(ctx.message.attachments) == 0 else False
 	if use_prev_msg:
 		async for message in ctx.channel.history(limit=10):
@@ -71,12 +71,12 @@ async def spoiler(ctx,*text):
 	await hook.delete()
 
 @client.command(aliases=["sw"])
-async def swear(ctx,*text):
+async def swear(ctx:commands.context.Context,*text):
 	with open("swears.json","r") as swearsfile: swears = json.loads(swearsfile.read())
 	text = list(text)
 	for word in text:
 		for swear in swears:
-			if swear in word:
+			if swear in word.lower():
 				text[text.index(word)] = f"||{word}||"
 	text = " ".join(text)
 	images = await attachments_to_files(ctx.message.attachments,True)
